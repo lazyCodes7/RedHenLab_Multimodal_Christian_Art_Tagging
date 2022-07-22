@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+RedHenLab_Multimodal_Christian_Art_Tagging/modules/object-detection/Emile_Male_Dataset
