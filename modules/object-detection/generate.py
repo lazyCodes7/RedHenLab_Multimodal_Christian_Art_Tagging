@@ -21,10 +21,9 @@ def generate_anchors(images, model, thresh = 0.4):
     anchor_labels = []
     for result in results:
         scores, transformed_anchors, classification = result['scores'], result['boxes'], result['labels']
-        idxs = nms(boxes = transformed_anchors, scores = scores, iou_threshold=thresh)
-        confidences.append(scores[idxs].cpu().detach().numpy())
-        bboxes.append(transformed_anchors[idxs].cpu().detach().numpy())
-        anchor_labels.append(classification[idxs].cpu().detach().numpy())
+        confidences.append(scores.cpu().detach().numpy())
+        bboxes.append(transformed_anchors.cpu().detach().numpy())
+        anchor_labels.append(classification.cpu().detach().numpy())
         
     
     anchor_df = pd.DataFrame({"bboxes" : bboxes, "confidences": confidences, "labels":anchor_labels})
@@ -37,13 +36,16 @@ def generate_all(batch_size = 20, threshold = 0.4):
     transform = Transform()
     device = "cpu"
     
-    
     metadata_df = pd.read_csv('Emile_Male_Dataset/Emile Male Pipeline/Data/metadata.csv')
     art_dataset = ChristianArtDataset(metadata_df, transform = transform.transform)
     try:
         model = models.detection.fasterrcnn_resnet50_fpn(pretrained=True).to(device)
+        in_features = model.roi_heads.box_predictor.cls_score.in_features
+        model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+        model.to(device)
+        model.load_state_dict(torch.load('frcnn_iconart_v2.pt', map_location=device))        
     except Exception as e:
-        print("hmm")
+        print(e)
     loader = DataLoader(art_dataset, batch_size = batch_size, shuffle = True)
     anchors = pd.DataFrame()
     for idx, (images, label) in enumerate(loader):
