@@ -1,0 +1,6 @@
+train: ./Iconart/images/train
+val: ./Iconart/images/valid
+test: ./Iconart/images/test
+
+nc: 14
+names: ['Angel', 'Baby', 'Book', 'Christ', 'Cross', 'Crown', 'Flower', 'Fort', 'Fruit', 'Mary', 'Person', 'Saint', 'Sheep', 'Staff']

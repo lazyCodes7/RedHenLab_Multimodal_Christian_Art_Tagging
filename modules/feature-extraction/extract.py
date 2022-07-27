@@ -17,7 +17,7 @@ def extract(image_dir, device, load_path):
     
     images = torch.stack(images, dim = 0)
     model = ArtDLClassifier(num_classes = 19).to(device)
-    module = model.net[4][0].conv1
+    module = model.net[7][0].conv1
     key = str(module)
     ac_handler = module.register_forward_hook(model.get_activations(key))
     images = images.to(device)
