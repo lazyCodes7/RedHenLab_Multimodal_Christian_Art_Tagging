@@ -12,6 +12,5 @@ def get_iconclass_labels():
 		label = urllib.parse.unquote(urls['uri']).split("/")[-1]
 		labels.append(label)
 
-	labels = labels[10:192] + labels[208:-6] + ["11F(VIRGIN MARY)"]
+	labels = labels[10:192] + labels[208:-6] + ["11F(VIRGIN MARY)"] + ["11F4(MADONNA)"] + ["11D(CHRIST)"]
 	return labels
-
