@@ -1,5 +1,35 @@
+import torch.nn as nn
+import torch
+from transformers import ViTForImageClassification
 class ArtDLClassifier(nn.Module):
+    '''
+        About:
+            ViT Classifier that acts as a feature extractor.
+        
+        Inputs:
+            c1_types - no of out classes of class_type 1
+            c2_types - no of out classes of class_type 2
+            c3_types - no of out classes of class_type 3
+        
+        Methods:
+            1. forward(self, x)
+                About:
+                    Implementation of forward propagation of the network defined.
+                    
+                Inputs: 
+                    x - the image to be used for inference/training
+                
+                Outputs:
+                    result_dict = {
+                        "mary" -> linear layer outputs for classification of mary
+                        "male_saint" -> linear layer outputs for classification of male saints
+                        "female_saint" -> linear layer outputs for classification of female saints
+                        "hidden_output" -> outputs the hidden state of the transformers
+                    }
+            
+    '''
     def __init__(self, c1_types, c2_types, c3_types):
+
         super().__init__()
         self.model = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224', output_hidden_states = True)
         self.fc1 = nn.Linear(1000, 500)
