@@ -14,19 +14,22 @@ from vit import ArtDLClassifier
 from tqdm import tqdm, trange
 import random
 import os
+import torch.optim as optim
 from nltk.translate.bleu_score import sentence_bleu
+import torchvision.transforms as transforms
 from PIL import Image, ImageFont, ImageDraw, ImageOps
-
+import torch.nn.functional as F
 
 def generate(
     model,
     tokenizer,
     prompt,
     image,
+    device,
     entry_count=10,
     entry_length=1024, #maximum number of words
     top_p=0.8,
-    temperature=1.,
+    temperature=1.
 ):
     model.eval()
     generated_num = 0
@@ -83,21 +86,18 @@ def generate(
 
 
 def train(
-    dataset, model,
-    batch_size=16, epochs=10, lr=2e-5,
+    dataset, model, device, criterion,
+    batch_size=16, epochs=10, lr=1e-4,
     max_seq_len=400, warmup_steps=200,
-    gpt2_type="gpt2", output_dir=".", output_prefix="",
+    gpt2_type="gpt2", output_dir=".", output_prefix="wreckgar",
     test_mode=False,save_model_on_epoch=False,
 ):
     acc_steps = 100
-    device=torch.device("cuda")
-    model = model.cuda()
+    model = model.to(device)
     model.train()
 
-    optimizer = AdamW(model.parameters(), lr=lr)
-    scheduler = get_linear_schedule_with_warmup(
-        optimizer, num_warmup_steps=warmup_steps, num_training_steps=-1
-    )
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+    
 
     train_dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
     loss=0
@@ -111,7 +111,7 @@ def train(
               image = image.to(device)
               caption = caption.to(device)
               outputs = model(image, caption)
-              outputs = outputs[0] 
+              outputs = outputs[0]
               shift_logits = outputs[..., :-1, :].contiguous()
               shift_labels = caption[..., 1:].contiguous()
               loss = criterion(shift_logits.view(-1, shift_logits.size(-1)).to(device), shift_labels.view(-1).to(device))
@@ -120,7 +120,6 @@ def train(
 
               if (accumulating_batch_count % batch_size) == 0:
                   optimizer.step()
-                  scheduler.step()
                   optimizer.zero_grad()
                   model.zero_grad()
 
@@ -133,12 +132,29 @@ def train(
     return model
 
 def run(train, dataset, device, write_every = 10):
+    transform=transforms.Compose([
+        # Padding is done to ensure resolution is same after resizing
+        transforms.Resize((224,224)),
+        transforms.CenterCrop((224,224)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        transforms.RandomHorizontalFlip(p=0.5)
+    ])
+
+
+    val_transform = transforms.Compose([
+        transforms.Resize((224,224)),
+        transforms.CenterCrop((224,224)),
+        transforms.ToTensor()
+        
+    ])
     if(dataset == 'desc'):
         dataset = ChristianArtDataset(data_dir = '/content/drive/MyDrive/Emile Male Pipeline/Data/Images/', transform = transform)
     else:
         dataset = ChristianArtDataset(data_dir = '/content/drive/MyDrive/Emile Male Pipeline/Data/Images/', transform = transform)
 
-
+    vit_model = ArtDLClassifier(2,2,2).to(device)
+    vit_model.load_state_dict(torch.load('/content/drive/MyDrive/Emile Male Pipeline/Models/vit_224x224_v1.pt', map_location = device))
     model = VisualGPT2Transformer(
         encoder_model = vit_model,
         src_vocab_size = 197,
@@ -172,22 +188,25 @@ def run(train, dataset, device, write_every = 10):
     train_set, val_set, test_set = data.random_split(dataset, (n_train, n_val, n_test))
 
     if(train):
-        train(train_set, model)
+        train(train_set, model, device = device, criterion = criterion)
     
     else:
-        model.load_state_dict('')
+        path = '/content/drive/MyDrive/CIFAR-10 Models/vit_base_title_224x224.pt'
+        model.load_state_dict(torch.load(path, map_location = device))
         bleu_score = 0
         generated_titles = []
-        for i in range(len(test_set)):
-            x = generate(model.to(device), model.decoder.tokenizer, " ", test_set[i][0].unsqueeze(0), entry_count=1, entry_length = len(test_set[i][1].squeeze()))
-            given_sentence = tokenizer.decode(test_set[i][1])
+        for i in range(10):
+            x = generate(model.to(device), model.decoder.tokenizer, " ", test_set[i][0].unsqueeze(0), entry_count=1, entry_length = len(test_set[i][1].squeeze()), device = device)
+            given_sentence = model.decoder.tokenizer.decode(test_set[i][1])
             if(i%write_every == 0):
                 img = test_set[i][0].permute(1,2,0).numpy()
-                img = Image.fromarray(img)
+                img = Image.fromarray((img * 255).astype(np.uint8))
+                generated = "".join(x)
+                print(generated)
                 img = ImageOps.expand(img, border=20, fill=(255,255,255))
                 draw = ImageDraw.Draw(img)
-                font = ImageFont.truetype("FONTS/arial.ttf", 24)
-                draw.text((0,0),x,(0,255,255),font=font)
+                font = ImageFont.truetype("arial.ttf", 24)
+                draw.text((0,0),generated,(0,255,255),font=font)
                 img.save('examples/sample-{}.jpg'.format(i))
             bleu_score += sentence_bleu(given_sentence, x)
             generated_titles.append(x)
@@ -195,5 +214,8 @@ def run(train, dataset, device, write_every = 10):
         print("===============================================")
         print(bleu_score)
         return generated_lyrics
+
+if __name__ == "__main__":
+    run(False, '', 'cpu')
         
 

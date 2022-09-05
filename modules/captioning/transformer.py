@@ -2,17 +2,37 @@ import torch.nn as nn
 import torch
 
 class SelfAttention(nn.Module):
+    '''
+    About:
+        Module that implements Self-Attention
+    
+    Inputs:
+        embed_size - Size of the lookup table/embedding
+        heads - No of attention head in case of MHA
+    
+    Methods:
+        1. forward(self, values, keys, query, mask)
+            Inputs:
+                values - Value vector used in self-attention
+                query - Query vector used in self-attention
+                keys - Key vector used in self-attention
+                mask - If using Masked MHA then required mask
+            
+            Outputs:
+                out -> self-attention vector of the size embed_size(also used as an input in case of more than one block)
+
+    '''
     def __init__(self, embed_size, heads):
         super(SelfAttention, self).__init__()
         self.heads = heads
         self.embed_size = embed_size
-        self.head_dim = embed_size/self.heads
+        self.head_dim = embed_size//self.heads
 
         assert(self.head_dim*self.heads == embed_size) , "Embed size need to be div by heads"
 
-        self.keys = nn.Linear(head_dim, head_dim)
-        self.values = nn.Linear(head_dim, head_dim)
-        self.queries = nn.Linear(head_dim, head_dim)
+        self.keys = nn.Linear(self.head_dim, self.head_dim, bias = False)
+        self.values = nn.Linear(self.head_dim, self.head_dim, bias = False)
+        self.queries = nn.Linear(self.head_dim, self.head_dim, bias = False)
         self.fc_out = nn.Linear(self.heads*self.head_dim, embed_size)
     
     def forward(self, values, keys, query, mask):
@@ -24,12 +44,12 @@ class SelfAttention(nn.Module):
 
         values = self.values(values)  # (N, value_len, heads, head_dim)
         keys = self.keys(keys)  # (N, key_len, heads, head_dim)
-        queries = self.queries(query)  # (N, query_len, heads, heads_dim)
+        queries = self.queries(queries)  # (N, query_len, heads, heads_dim)
 
         energy = torch.einsum("nqhd, nkhd->nhqk", [queries, keys])
 
         if mask is not None:
-            energy = energy.masked_fill(mask = 0, float("-1e20"))
+            energy = energy.masked_fill(mask == 0, float("-1e20"))
         
         attention = torch.softmax(energy / (self.embed_size ** (1/2)), dim=3)
 
@@ -40,6 +60,28 @@ class SelfAttention(nn.Module):
         return out
 
 class TransformerBlock(nn.Module):
+    '''
+    About:
+
+    Inputs: 
+        embed_size - Size of the embedding/lookup table
+        heads - No of heads for MHA
+        dropout - Percentage of nodes to drop to prevent overfitting
+        forward_expansion - Expanding and contracting the output of self-attention by a certain factor
+    
+    Methods:
+        1. forward(self, values, keys, query, mask)
+            Inputs:
+                values - Value vector used in self-attention
+                query - Query vector used in self-attention
+                keys - Key vector used in self-attention
+                mask - If using Masked MHA then required mask
+            
+            Outputs:
+                out -> self-attention vector of the size embed_size(also used as an input in case of more than one block)
+        
+
+    '''
     def __init__(self, embed_size, heads, dropout, forward_expansion):
         super(TransformerBlock, self).__init__()
         self.embed_size = embed_size
@@ -61,7 +103,7 @@ class TransformerBlock(nn.Module):
         ffn = self.ffn(attention_out)
         ffn_out = self.dropout(self.norm2(ffn+attention_out))
         return ffn_out
-
+'''
 
 class Encoder(nn.Module):
     def __init__(
@@ -99,8 +141,34 @@ class Encoder(nn.Module):
             out = layer(out, out, out, mask)
 
         return out
+'''
 
 class DecoderBlock(nn.Module):
+    '''
+    About:
+        Implementation of the Masked-MHA for Decoder
+
+    Inputs: 
+        embed_size - Size of the embedding/lookup table
+        heads - No of heads for MHA
+        dropout - Percentage of nodes to drop to prevent overfitting
+        forward_expansion - Expanding and contracting the output of self-attention by a certain factor
+        device - Setting the device to train on
+    
+    Methods:
+        1. forward(self, values, keys, query, mask)
+            Inputs:
+                values - Value vector used in self-attention(Comes from the encoder block)
+                captions - Embedding representation of tokenized captions
+                src_mask - Used in masking in encoder outputs
+                target_mask - Used in masking the decoder outputs
+                keys - Key vector used in self-attention
+                mask - If using Masked MHA then required mask
+            
+            Outputs:
+                out -> self-attention vector of the size embed_size(also used as an input in case of more than one block)
+
+    '''
     def __init__(
         self,
         embed_size,
@@ -109,6 +177,7 @@ class DecoderBlock(nn.Module):
         dropout,
         device
     ):
+
         super(DecoderBlock, self).__init__()
         self.attention = SelfAttention(embed_size, heads)
         self.transformer_block = TransformerBlock(embed_size, heads, dropout, forward_expansion)
@@ -121,6 +190,7 @@ class DecoderBlock(nn.Module):
         out = self.transformer_block(value, key, query, src_mask)
         return out
 
+'''
 class Decoder(nn.Module):
     def __init__(
         self,
@@ -150,7 +220,7 @@ class Decoder(nn.Module):
         input_features = self.dropout(self.embedding(captions) + self.pos_encoding(positions))
 
         for layer in self.layers:
-            x = layer(x, enc_out, enc_out, src_mask, trg_mask)
+            x = layer(x, enc_out, enc_out, src_mask, target_mask)
         
         out = self.fc_out(x)
         return out
@@ -199,7 +269,7 @@ class Transformer(nn.Module):
         self.device = device
 
     def create_target_mask(self, target):
-        N, trg_len = trg.shape
+        N, trg_len = target.shape
         trg_mask = torch.tril(torch.ones((trg_len, trg_len))).expand(N, 1, trg_len, trg_len)
         return trg_mask.to(self.device)
     
@@ -209,8 +279,4 @@ class Transformer(nn.Module):
         out = self.decoder(enc_out, captions,  None, trg_mask)
         return out
 
-
-
-
-
-
+'''
