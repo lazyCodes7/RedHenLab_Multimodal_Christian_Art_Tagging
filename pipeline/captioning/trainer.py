@@ -216,7 +216,7 @@ class Trainer:
         generated_captions = []
         actual_captions = []
 
-        for i in trange(10):
+        for i in trange(self.test_set):
             prompt = self.model.decoder.tokenizer.decode(self.test_set[i][1]).split("<|")[1].split("|>")[0]
 
             x = self.generate_captions(
