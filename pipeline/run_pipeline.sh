@@ -6,7 +6,7 @@ echo "Files synced successfully"
 
 echo "Creating singularity enviroment...."
 module load singularity/3.8.1
-singularity pull docker://lazycodes7/christian-art-tagging:latest
+singularity pull docker://ghcr.io/lazycodes7/christian-art-tagging:latest
 mkdir curation/EmileMaleDataset
 echo "Enviroment successfully created."
 
