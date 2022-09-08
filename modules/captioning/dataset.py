@@ -27,7 +27,7 @@ class SquarePad:
 
 class ChristianArtDataset(Dataset):
 
-    def __init__(self, data_dir, transform = None, gpt2_type="gpt2", max_length=1024):
+    def __init__(self, data_dir, transform = None, gpt2_type="gpt2", max_length=1024, metadata_path = None):
         '''
         About:
             Instantiates the dataset class for iterating over art collections
@@ -58,7 +58,7 @@ class ChristianArtDataset(Dataset):
             print(dataset[0])
 
         '''  
-        self.metadata_df = pd.read_csv('/content/drive/MyDrive/Emile Male Pipeline/Data/metadata_v2.csv')
+        self.metadata_df = pd.read_csv(metadata_path)
         self.metadata_df = self.metadata_df[self.metadata_df['TITLE'].isnull() == False]
         self.metadata_df.reset_index(inplace = True, drop = True)
         self.metadata_df['TITLE_TRUNCATED'] = self.metadata_df['TITLE'].apply(lambda x : " ".join(tokenize.word_tokenize(x)[:512]))

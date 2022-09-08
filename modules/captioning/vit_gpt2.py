@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch
 
-from transformer import DecoderBlock, TransformerBlock
+from modules.captioning.transformer import DecoderBlock, TransformerBlock
 import torch.nn as nn
 import torch
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
@@ -100,7 +100,7 @@ class GPT2Decoder(nn.Module):
         out = self.fc_out(x)
         return out, self.gpt2_model(captions).logits, self.gpt2_model(captions).loss
 
-class VitEncoder(nn.Module):
+class ViTEncoder(nn.Module):
     def __init__(
         self, 
         embed_size,
@@ -110,7 +110,8 @@ class VitEncoder(nn.Module):
         dropout,
         num_layers,
         forward_expansion,
-        model
+        model,
+        max_length
     ):
         '''
             About:
@@ -156,6 +157,8 @@ class VitEncoder(nn.Module):
         '''
         super(ViTEncoder, self).__init__()
         self.embed_size = embed_size
+        self.embedding = nn.Linear(src_vocab_size, embed_size)
+
         self.device = device
         self.layers = nn.ModuleList([
             TransformerBlock(
@@ -169,6 +172,8 @@ class VitEncoder(nn.Module):
         ])
         self.model = model.to(self.device)
         self.dropout = nn.Dropout(dropout)
+        self.pos_encoding = nn.Embedding(max_length, embed_size)
+
     
     def forward(self, features, mask = None):
         features = self.model(features)['hidden_output']
@@ -267,8 +272,8 @@ class VisualGPT2Transformer(nn.Module):
             dropout,
             num_layers,
             forward_expansion,
-            max_length,
-            encoder_model
+            encoder_model,
+            max_length
         ).to(self.device)
 
         self.decoder = GPT2Decoder(
