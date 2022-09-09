@@ -11,7 +11,7 @@ Tagging Christian Art pieces using Computer Vision!
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
-    <li><a href="#new">New!</a></li>
+    <li><a href="#pipeline">Pipeline</a></li>
     <li><a href="#milestones">Milestones</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
@@ -23,7 +23,6 @@ Tagging Christian Art pieces using Computer Vision!
     <li><a href="#usage">Usage</a></li>
     <li><a href="#example">Example</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
    
@@ -44,6 +43,8 @@ Christian Iconography refers to the study of identifying the saints in a paintin
 * [Docker]()
 * [Detectron2]()
 
+## Pipeline
+<img src = 'utils/5.png'>
 
 ## Milestones
 - Improving the quality of curated captions in order to build a more robust model
@@ -216,21 +217,7 @@ python captioning/train.py --data_dir curation/EmileMaleDataset/ --feature_extra
 <!-- ROADMAP -->
 ## Roadmap
 
-See the [open issues](https://github.com/lazyCodes7/tbd/issues) for a list of proposed features (and known issues).
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
+See the [open issues](https://github.com/lazyCodes7/RedHenLab_Multimodal_Christian_Art_Tagging/issues) for a list of proposed features (and known issues).
 
 
 <!-- LICENSE -->
