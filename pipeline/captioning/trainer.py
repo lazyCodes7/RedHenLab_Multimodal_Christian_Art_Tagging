@@ -48,6 +48,7 @@ class Trainer:
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.metadata_path = metadata_path
+        self.save_model_on_epoch = True
         if(inference == False):
             self.train_set, self.val_set, self.test_set = self.generate_dataset(self.t.transform)
 
@@ -200,7 +201,7 @@ class Trainer:
                         optimizer.zero_grad()
 
                     accumulating_batch_count += 1
-                if save_model_on_epoch:
+                if self.save_model_on_epoch:
                     torch.save(
                         self.model.state_dict(),
                         os.path.join(output_dir, f"{output_prefix}-{epoch}.pt"),
