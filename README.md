@@ -141,7 +141,33 @@ singularity run --nv christian-art-tagging_latest.sif python captioning/train.py
 
 ```
 
-As we can see in the script the pipeline is an amalgamation of three individual modules. The first module is curation which as the name suggests downloads the dataset I have collected. The second step is to train a feature extractor that can extract features from the images. The current version of the pipeline use a Vision Transformer instead of using FRCNN. Know more about the reasoning here. Finally we have the captioning model aka a transformer that leverages both the image and text to generate captions.
+As we can see in the script the pipeline is an amalgamation of three individual modules. The first module is curation which as the name suggests downloads the dataset I have collected. The second step is to train a feature extractor that can extract features from the images. The current version of the pipeline uses a Vision Transformer instead of using FRCNN(Why this though). Finally we have the captioning model aka a transformer that leverages both the image and text to generate captions.
+
+### 2. Running the modules from the pipeline locally.
+In order to run the modules from the pipeline follow the steps used in setup and use ```cd pipeline``` to navigate to the pipeline
+
+#### Singularity setup
+While we do not need singularity to run the modules locally. Here is how to setup the container for local use.
+```
+singularity pull docker://ghcr.io/lazycodes7/christian-art-tagging:latest
+```
+#### Running the curation module locally.
+##### Help
+```
+    -p/--metadata_path - The path to metadata file
+    -d/--data_dir - The path to download the dataset to
+    -f/--force - Force download an image even if it is already downloaded
+```
+##### Example
+```
+# using singularity
+singularity run --nv christian-art-tagging_latest.sif python curation/generator.py --metadata_path curation/metadata_v2.csv --data_dir curation/EmileMaleDataset/
+
+# just running
+python curation/generator.py --metadata_path curation/metadata_v2.csv --data_dir curation/EmileMaleDataset/
+
+```
+
 
 
 ## Example
