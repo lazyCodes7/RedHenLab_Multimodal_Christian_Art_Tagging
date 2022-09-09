@@ -12,6 +12,7 @@ Tagging Christian Art pieces using Computer Vision!
       </ul>
     </li>
     <li><a href="#pipeline">Pipeline</a></li>
+    <li><a href="#milestones">Milestones</a></li>
     <li><a href="#future-deliverables">Future Deliverables</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
@@ -45,6 +46,11 @@ Christian Iconography refers to the study of identifying the saints in a paintin
 
 ## Pipeline
 <img src = 'utils/5.png'>
+
+## Milestones
+- Curated a dataset of 9.6k images with provided captions, titles, and miscellanous metadata
+- Worked on a feature extractor module that can also detect the saints and their attributes in the painting
+- Finally, managed to deliver a ViT+GPT2 based Transformer that uses images + prompts to caption the Christian Icons in the painting
 
 ## Future Deliverables
 - Improving the quality of curated captions in order to build a more robust model
