@@ -168,10 +168,50 @@ python curation/generator.py --metadata_path curation/metadata_v2.csv --data_dir
 
 ```
 
+#### Running the feature_extraction module locally.
+##### Help
+```
+    -b, --train_batch_size - Batch size for training
+    --data_dir - Directory to use images for training
+    --device - Device to train/test on
+    --train - Flag to train/test
+    -p,--model_path - Trained model path to be used during testing
+    -c, --collect - Collect the ArtDL dataset if not already present
 
+```
+##### Example
+```
+# using singularity
+singularity run --nv christian-art-tagging_latest.sif python feature_extractor/train.py -c --train --device cuda --data_dir feature_extractor/
 
-## Example
-TBD
+# just running
+python feature_extractor/train.py -c --train --device cuda --data_dir feature_extractor/
+```
+
+#### Running the captioning module locally.
+##### Help
+```
+    --metadata_path - The path to metadata file
+    --data_dir - Directory to use images for training
+    --feature_extractor_path - Model path from stage-2 feature extractor
+    -e, --epochs - No of epochs to train the model for
+    -lr, --learning_rate - Learning rate for the model
+    -d, --device - Device to train/test on
+    --train - Flag to train/test
+    --train_batch_size - Batch size for training
+    --captioning_model_path - Saved path of the captioning model(Useful during inference)
+
+```
+##### Example
+```
+# using singularity
+singularity run --nv christian-art-tagging_latest.sif python captioning/train.py --data_dir curation/EmileMaleDataset/ --feature_extractor_path feature_extractor/artDL.pt --device cuda --train
+
+# just running
+python captioning/train.py --data_dir curation/EmileMaleDataset/ --feature_extractor_path feature_extractor/artDL.pt --device cuda --train
+
+```
+
 
 <!-- ROADMAP -->
 ## Roadmap
