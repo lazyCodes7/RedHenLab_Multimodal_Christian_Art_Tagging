@@ -158,7 +158,7 @@ if __name__ == "__main__":
     )
     if(args.train):
       trainer.train()
-      torch.save('artDL.pt', trainer.model.state_dict())
+      torch.save(trainer.model.state_dict(), 'artDL.pt')
     
     else:
       trainer.test(args.model_path)
