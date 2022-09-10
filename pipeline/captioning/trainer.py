@@ -204,7 +204,7 @@ class Trainer:
                 if self.save_model_on_epoch:
                     torch.save(
                         self.model.state_dict(),
-                        os.path.join(output_dir, f"{output_prefix}-{epoch}.pt"),
+                        f"captioning/runs/training/vit_gpt2-{epoch}.pt",
     
                     )
         
