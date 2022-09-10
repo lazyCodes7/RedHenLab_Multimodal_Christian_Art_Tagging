@@ -17,4 +17,4 @@ echo "Stage: 2- Training the feature-extractor to extract patch level features"
 singularity run --nv christian-art-tagging_latest.sif python feature_extractor/train.py -c --train --device cuda --data_dir feature_extractor/
 
 echo "Stage: 3- Training the Image-Captioning model that uses intra-modal features"
-singularity run --nv christian-art-tagging_latest.sif python captioning/train.py --data_dir curation/EmileMaleDataset/ --feature_extractor_path feature_extractor/artDL.pt --device cuda --train
+singularity run --nv christian-art-tagging_latest.sif python captioning/train.py --data_dir curation/EmileMaleDataset/ --feature_extractor_path artDL.pt --device cuda --train
