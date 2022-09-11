@@ -45,7 +45,7 @@ Christian Iconography refers to the study of identifying the saints in a paintin
 * [Detectron2]()
 
 ## Pipeline
-<img src = 'utils/5.png'>
+<img src = 'utils/final_pipeline.png'>
 
 ## Milestones
 - Curated a dataset of 9.6k images with provided captions, titles, and miscellanous metadata

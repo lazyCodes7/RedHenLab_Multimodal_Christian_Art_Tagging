@@ -232,7 +232,7 @@ class Trainer:
             actual_captions.append(self.model.decoder.tokenizer.decode(self.test_set[i][1]))
 
         return generated_captions, actual_captions
-    
+        
     def test(self):
         actual_coco = {}
         actual_coco['annotations'] = []
@@ -256,17 +256,16 @@ class Trainer:
             actual_coco['annotations'].append(ac_coco_item)
 
         rng = range(len(actual_captions))
-        output = {"rng":rng, "actual_coco": actual_coco, "generated_coco": generated_coco}
-        #results = calculate_metrics(rng, generated_coco, actual_coco)
+        results = calculate_metrics(rng, generated_coco, actual_coco)
 
-        print("Saving Outputs.........")
+        print("Saving Metrics.........")
         current_files = os.listdir('captioning/runs/training')
         if(len(current_files) == 0):
-            filehandler = open(b"captioning/runs/training/outputs.pth","wb")
-            filename = "captioning/runs/training/outputs.pth"
+            filehandler = open(b"captioning/runs/training/metrics.pth","wb")
+            filename = "captioning/runs/training/metrics.pth"
         else:
-            filehandler = open("captioning/runs/training/outputs{}.pth".format(len(current_files)),"wb")
-            filename = "captioning/runs/inferences/outputs{}.pth".format(len(current_files))
+            filehandler = open("captioning/runs/training/metrics{}.pth".format(len(current_files)),"wb")
+            filename = "captioning/runs/inferences/metrics{}.pth".format(len(current_files))
         
-        pickle.dump(output,filehandler)
+        pickle.dump(results,filehandler)
         print("Results saved successfully at {}".format(os.getcwd() + "/" + filename))
