@@ -22,7 +22,7 @@ Tagging Christian Art pieces using Computer Vision!
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#example">Example</a></li>
+    <li><a href="#blog">Blog</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -148,7 +148,7 @@ singularity run --nv christian-art-tagging_latest.sif python captioning/train.py
 
 ```
 
-As we can see in the script the pipeline is an amalgamation of three individual modules. The first module is curation which as the name suggests downloads the dataset I have collected. The second step is to train a feature extractor that can extract features from the images. The current version of the pipeline uses a Vision Transformer instead of using FRCNN(Why this though). Finally we have the captioning model aka a transformer that leverages both the image and text to generate captions.
+As we can see in the script the pipeline is an amalgamation of three individual modules. The first module is curation which as the name suggests downloads the dataset I have collected. The second step is to train a feature extractor that can extract features from the images. The current version of the pipeline uses a Vision Transformer instead of using FRCNN([Why](https://lazycodes7.github.io/posts/week14/) this though). Finally we have the captioning model aka a transformer that leverages both the image and text to generate captions.
 
 ### 2. Running the modules from the pipeline locally.
 In order to run the modules from the pipeline follow the steps used in setup and use ```cd pipeline``` to navigate to the pipeline
@@ -175,6 +175,9 @@ python curation/generator.py --metadata_path curation/metadata_v2.csv --data_dir
 
 ```
 
+##### Outputs
+9.6K Data points from different museums consisting of different art styles
+
 #### Running the feature_extraction module locally.
 ##### Help
 ```
@@ -194,6 +197,9 @@ singularity run --nv christian-art-tagging_latest.sif python feature_extractor/t
 # just running
 python feature_extractor/train.py -c --train --device cuda --data_dir feature_extractor/
 ```
+
+##### Outputs 
+Weights for feature-extraction model that are to be used in the captioning module
 
 #### Running the captioning module locally.
 ##### Help
@@ -219,6 +225,11 @@ python captioning/train.py --data_dir curation/EmileMaleDataset/ --feature_extra
 
 ```
 
+##### Outputs 
+Captions based on the prompts during inference and associated captioning metrics during training+testing. See the results [here](https://lazycodes7.github.io/posts/week16/)
+
+## Blog
+Know more details about how this project has progressed [here](https://lazycodes7.github.io/categories/google-summer-of-code/)
 
 <!-- ROADMAP -->
 ## Roadmap
